@@ -1,122 +1,111 @@
-## About The Project
-Mikrotik compatible Docker image to run Amnezia WG on Mikrotik routers. As of now, support Arm v7 boards
+## About This Project
 
-## About The Project
-This is a highly experimental attempt to run [Amnezia-WG](https://github.com/amnezia-vpn/amnezia-wg) on a Mikrotik router.
+This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sannikov/amnezia-wg-docker), aiming to provide a Mikrotik-compatible Docker image to run Amnezia WG on Mikrotik routers.
 
-### Prerequisites
+The main focus of this fork is to enhance the security and stability of the build process by:
+- Upgrading to the latest Go version (1.24.1)
+- Updating all dependencies to their latest secure versions
+- Using a modern builder image
+- Minimizing vulnerabilities in the resulting Docker image
 
-Follow the [Mikrotik guidelines](https://help.mikrotik.com/docs/display/ROS/Container) to enable container support.
+Currently, the project supports building for **ARMv7**, **ARM64**, and **MIPS** architectures.
 
-Install [Docker buildx](https://github.com/docker/buildx) subsystem, make and go.
+## Prerequisites
 
+- Follow the [Mikrotik guidelines](https://help.mikrotik.com/docs/display/ROS/Container) to enable container support on your Mikrotik router.
+- Install [Docker Buildx](https://github.com/docker/buildx)
+- Ensure you have `make` and `go` installed on your machine.
 
-### Building Docker Image
+## Dependencies Used
 
-You may need to initialize submodules
+This fork uses the following Go modules:
 
 ```
-git submodule init
-git submodule update
+go 1.24.1
+        github.com/tevino/abool/v2 v2.1.0
+        golang.org/x/crypto v0.36.0
+        golang.org/x/net v0.37.0
+        golang.org/x/sys v0.31.0
+        golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
+        gvisor.dev/gvisor v0.0.0-20250319221736-c16d3fdfadf8
+        github.com/google/btree v1.1.3
+        golang.org/x/time v0.11.0
 ```
 
-To build a Docker container for the ARM7 run
-```
+## Building Docker Image
+
+This project clones `amneziawg-go` from a customized and updated repository:
+[drkivi/amneziawg-go](https://github.com/drkivi/amneziawg-go)
+
+To build for **ARMv7**:
+```sh
 make build-arm7
 ```
-This command should cross-compile amnezia-wg locally and then build a docker image for ARM7 arch.
 
-To export a generated image, use
+To build for **ARM64**:
+```sh
+make build-arm64
 ```
+
+To build for **MIPS**:
+```sh
+make build-mips
+```
+
+To export the built image:
+```sh
 make export-arm7
+make export-arm64
+make export-mips
 ```
 
-You will get the `docker-awg-arm7.tar` archive ready to upload to the Mikrotik router.
+You will get a `amneziawg-for-armv7.tar`, `amneziawg-for-arm64.tar`, or `amneziawg-for-mips.tar` archive ready to upload to your Mikrotik router.
 
-### Running locally
+Connection setup instructions for **ARMv7** and **ARM64** images are available on the Docker Hub page [ARMv7](https://hub.docker.com/r/drkivi/amneziawg-for-armv7) & [ARM64](https://hub.docker.com/r/drkivi/amneziawg-for-arm64).
 
-Just run `docker compose up`
 
-Make sure to create a `awg` folder with the `wg0.conf` file.
+## Sample wg0.conf
 
-Example `wg0.conf`:
+This is a general example of `wg0.conf` configuration. The only difference between Mikrotik and Raspberry Pi setups is the private gateway IP address used for routing:
+- For **Mikrotik**, the default private IP is `192.168.88.1`
+- For **Raspberry Pi (Docker)**, the default private IP is `172.17.0.1`
 
-```
+### General wg0.conf
+```ini
 [Interface]
-PrivateKey = gG...Y3s=
-Address = 10.0.0.1/32
-ListenPort = 51820
-# Jc лучше брать в интервале [3,10], Jmin = 100, Jmax = 1000,
-Jc = 3
-Jmin = 100
-Jmax = 1000
-# Parameters below will not work with the existing WireGuarg implementation.
-# Use if your peer running Amnesia-WG
-# S1 = 324
-# S2 = 452
-# H1 = 25
+Address = 10.8.1.2/32
+DNS = [ip.of.awg.dns], 1.0.0.1
+PrivateKey = YLeSX...Hsa3=
+Jc = [Jc value]
+Jmin = [Jmin value]
+Jmax = [Jmax value]
+S1 = [S1 value]
+S2 = [S2 value]
+H1 = [H1 value]
+H2 = [H2 value]
+H3 = [H3 value]
+H4 = [H4 value]
 
-# IP masquerading
-PreUp = iptables -t nat -A POSTROUTING ! -o %i -j MASQUERADE
-# Firewall wg peers from other hosts
-PreUp = iptables -A FORWARD -o %i -m state --state ESTABLISHED,RELATED -j ACCEPT
-PreUp = iptables -A FORWARD -o %i -j REJECT
+Table = awg
 
-# Remote settings for my workstation
+PreUp = iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+PostUp = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
+PostUp = ip route flush table awg
+PostUp = ip rule add priority 300 from all iif eth0 lookup awg || true
+PostUp = ip route add ip.of.awg.server via 192.168.88.1 dev eth0
+PostUp = ip route replace default dev wg0
+
+PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
+PostDown = ip rule del from all iif eth0 lookup awg || true
+PostDown = ip route replace default via 192.168.88.1 dev eth0
+PostDown = ip route del ip.of.awg.server via 192.168.88.1 dev eth0
+
 [Peer]
-PublicKey = wx...U=
-AllowedIPs = 10.0.0.2/32
-# An IP address to check peer connectivity (specific to this repo)
-TestIP = 10.0.0.2
-# Your existing Wireguard server
-Endpoint=xx.xx.xx.xx:51820
+PublicKey = N22i......7C0i=
+PresharedKey = Cjkx....pF+J=
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = ip.of.awg.server:port
 PersistentKeepalive = 25
-
 ```
 
-### Mikrotik Configuration
-
-Set up interface and IP address for the containers
-
-```
-/interface bridge
-add name=containers
-
-/interface veth
-add address=172.17.0.2/24 gateway=172.17.0.1 gateway6="" name=veth1
-
-/interface bridge port
-add bridge=containers interface=veth1
-
-/ip address
-add address=172.17.0.1/24 interface=containers network=172.17.0.0
-```
-Set up masquerading for the outgoing traffic and dstnat
-
-```
-/ip firewall nat
-add action=masquerade chain=srcnat comment="Outgoing NAT for containers" src-address=172.17.0.0/24
-/ip firewall nat
-add action=dst-nat chain=dstnat comment=amnezia-wg dst-port=51820 protocol=udp to-addresses=172.17.0.2 to-ports=51820
-```
-
-Set up mount with the Wireguard configuration
-
-```
-/container mounts
-add dst=/etc/amnezia/amneziawg/ name=awg_config src=/awg
-
-/container/add cmd=/sbin/init hostname=amnezia interface=veth1 logging=yes mounts=awg_config file=docker-awg-arm7.tar
-```
-
-To start the container run
-
-```
-/container/start 0
-```
-
-To get the container shell
-
-```
-/container/shell 0
-```
