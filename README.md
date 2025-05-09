@@ -3,7 +3,7 @@
 This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sannikov/amnezia-wg-docker), aiming to provide a Mikrotik-compatible Docker image to run Amnezia WG on Mikrotik routers.
 
 The main focus of this fork is to enhance the security and stability of the build process by:
-- Upgrading to the latest Go version (1.24.2)
+- Upgrading to the latest Go version (1.24.3)
 - Updating all dependencies to their latest secure versions
 - Using a modern builder image
 - Minimizing vulnerabilities in the resulting Docker image
@@ -21,13 +21,13 @@ Currently, the project supports building for **ARMv7**, **ARM64**, and **MIPS** 
 This fork uses the following Go modules:
 
 ```
-go 1.24.2
+go 1.24.3
         github.com/tevino/abool/v2 v2.1.0
-        golang.org/x/crypto v0.37.0
-        golang.org/x/net v0.39.0
+        golang.org/x/crypto v0.38.0
+        golang.org/x/net v0.40.0
         golang.org/x/sys v0.33.0
         golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
-        gvisor.dev/gvisor v0.0.0-20250503011706-39ed1f5ac29c
+        gvisor.dev/gvisor v0.0.0-20250509002459-06cdc4c49840
         github.com/google/btree v1.1.3
         golang.org/x/time v0.11.0
 ```
@@ -39,7 +39,7 @@ This project clones `amneziawg-go` from a customized and updated repository:
 
 To build for **ARMv7**:
 ```sh
-make build-arm7
+make build-armv7
 ```
 
 To build for **ARM64**:
@@ -54,7 +54,7 @@ make build-mips
 
 To export the built image:
 ```sh
-make export-arm7
+make export-armv7
 make export-arm64
 make export-mips
 ```
