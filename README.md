@@ -3,7 +3,7 @@
 This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sannikov/amnezia-wg-docker), aiming to provide a Mikrotik-compatible Docker image to run Amnezia WG on Mikrotik routers.
 
 The main focus of this fork is to enhance the security and stability of the build process by:
-- Upgrading to the latest Go version (1.24.3)
+- Upgrading to the latest Go version (1.24.5)
 - Updating all dependencies to their latest secure versions
 - Using a modern builder image
 - Minimizing vulnerabilities in the resulting Docker image
@@ -21,15 +21,17 @@ Currently, the project supports building for **ARMv7**, **ARM64**, and **MIPS** 
 This fork uses the following Go modules:
 
 ```
-go 1.24.3
+go 1.24.5
         github.com/tevino/abool/v2 v2.1.0
-        golang.org/x/crypto v0.38.0
-        golang.org/x/net v0.40.0
-        golang.org/x/sys v0.33.0
+        golang.org/x/crypto v0.40.0
+        golang.org/x/net v0.42.0
+        golang.org/x/sys v0.34.0
         golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
-        gvisor.dev/gvisor v0.0.0-20250509002459-06cdc4c49840
+        gvisor.dev/gvisor v0.0.0-20250710223154-7323f1df8aad
         github.com/google/btree v1.1.3
-        golang.org/x/time v0.11.0
+        golang.org/x/time v0.12.0
+
+        AWG_Tools v1.0.20250706
 ```
 
 ## Building Docker Image
