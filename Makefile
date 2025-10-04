@@ -20,13 +20,13 @@ awg-mips:
 	fi
 
 build-armv7: awg-armv7
-	DOCKER_BUILDKIT=1 docker buildx build --no-cache --platform linux/arm/v7 --output=type=docker --tag amneziawg-for-armv7:latest .
+	DOCKER_BUILDKIT=1 docker buildx build --no-cache --platform linux/arm/v7 --tag amneziawg-for-armv7:latest .
 
 build-arm64: awg-arm64
-	DOCKER_BUILDKIT=1 docker buildx build --no-cache --platform linux/arm64 --output=type=docker --tag amneziawg-for-arm64:latest .
+	DOCKER_BUILDKIT=1 docker buildx build --no-cache --platform linux/arm64 --tag amneziawg-for-arm64:latest .
 
 build-mips: awg-mips
-	DOCKER_BUILDKIT=1 docker buildx build --no-cache --platform linux/mipsle --output=type=docker --tag amneziawg-for-mips:latest .
+	DOCKER_BUILDKIT=1 docker buildx build --no-cache --platform linux/mipsle --tag amneziawg-for-mips:latest .
 
 export-armv7: build-armv7
 	docker save amneziawg-for-armv7:latest > amneziawg-for-armv7.tar
