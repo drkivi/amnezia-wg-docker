@@ -76,6 +76,7 @@ Connection setup instructions for **ARMv7** and **ARM64** images are available o
 This is a general example of `wg0.conf` configuration. The only difference between Mikrotik and Raspberry Pi setups is the private gateway IP address used for routing:
 - For **Mikrotik**, the default private IP is `192.168.88.1`
 - For **Raspberry Pi (Docker)**, the default private IP is `172.17.0.1`
+- Note: From **RouterOS 7.20** the `eth0` interface should be changed to `veth1`
 
 ### General wg0.conf
 ```ini
