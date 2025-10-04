@@ -3,7 +3,7 @@
 This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sannikov/amnezia-wg-docker), aiming to provide a Mikrotik-compatible Docker image to run Amnezia WG on Mikrotik routers.
 
 The main focus of this fork is to enhance the security and stability of the build process by:
-- Upgrading to the latest Go version (1.24.5)
+- Upgrading to the latest Go version (1.25.1)
 - Updating all dependencies to their latest secure versions
 - Using a modern builder image
 - Minimizing vulnerabilities in the resulting Docker image
@@ -21,18 +21,23 @@ Currently, the project supports building for **ARMv7**, **ARM64**, and **MIPS** 
 This fork uses the following Go modules:
 
 ```
-go 1.24.5
+go 1.25.1
+	github.com/stretchr/testify v1.11.1
+	go.uber.org/atomic v1.11.0
         github.com/tevino/abool/v2 v2.1.0
-        golang.org/x/crypto v0.40.0
-        golang.org/x/net v0.42.0
-        golang.org/x/sys v0.34.0
+        golang.org/x/crypto v0.42.0
+        golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9
+        golang.org/x/time v0.13.0
+        golang.org/x/net v0.44.0
+        golang.org/x/sys v0.36.0
         golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
-        gvisor.dev/gvisor v0.0.0-20250710223154-7323f1df8aad
+        gvisor.dev/gvisor v0.0.0-20251002205934-c7e2a2ab44b4
         github.com/google/btree v1.1.3
-        golang.org/x/time v0.12.0
+	github.com/davecgh/go-spew v1.1.1
+	github.com/pmezard/go-difflib v1.0.0 
+	gopkg.in/yaml.v3 v3.0.1
 
-        AWG_Tools v1.0.20250706
-```
+        AWG_Tools v1.0.20250903 ```
 
 ## Building Docker Image
 
