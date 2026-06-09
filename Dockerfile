@@ -1,5 +1,5 @@
-ARG GOLANG_VERSION=1.25.1
-ARG ALPINE_VERSION=3.22
+ARG GOLANG_VERSION=1.26.4
+ARG ALPINE_VERSION=3.23
 FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 RUN apk update && apk add --no-cache \
@@ -17,7 +17,7 @@ RUN apk update && apk add --no-cache \
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /var/log/*
 
 COPY --from=builder /go/amneziawg-go/amneziawg-go /usr/bin/amneziawg-go
-COPY --from=builder /go/amneziawg-tools/src/wg-quick/awg /usr/bin/awg
+COPY --from=builder /go/amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=builder /go/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
 COPY wireguard-fs /
 
