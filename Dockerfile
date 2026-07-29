@@ -1,6 +1,10 @@
-ARG GOLANG_VERSION=1.26.4
-ARG ALPINE_VERSION=3.23
-FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
+ARG GOLANG_VERSION=1.26.5
+# Docker only publishes the golang+alpine composite tag at alpine minor granularity
+# (no ".../alpine3.24.1"), so the builder stage pins the minor line here...
+ARG GOLANG_ALPINE_MINOR=3.24
+# ...while the runtime stage below pins the exact patch release.
+ARG ALPINE_VERSION=3.24.1
+FROM golang:${GOLANG_VERSION}-alpine${GOLANG_ALPINE_MINOR} AS builder
 
 RUN apk update && apk add --no-cache \
     git make bash build-base linux-headers iproute2
