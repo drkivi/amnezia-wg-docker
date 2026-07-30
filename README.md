@@ -3,10 +3,10 @@
 This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sannikov/amnezia-wg-docker), providing a MikroTik-compatible Docker image to run AmneziaWG on MikroTik routers.
 
 Key features of this fork:
-- Full **AmneziaWG 2.0** support — `S3`/`S4`, `H1`–`H4` range format, and `I1`–`I5` obfuscation chain parameters
-- Upgraded to Go 1.26.4 with all dependencies updated to latest secure versions
+- Full **AmneziaWG 3.0** support — header protection (`HeaderProtectionKey`), random content padding (`ContentPaddingAddition`), and randomizable handshake timings, on top of the existing `S3`/`S4`, `H1`–`H4` range format, and `I1`–`I5` obfuscation chain parameters from AmneziaWG 2.0
+- Upgraded to Go 1.26.5 with all dependencies updated to latest secure versions
 - Built from [drkivi/amneziawg-go](https://github.com/drkivi/amneziawg-go) — a maintained fork of [amnezia-vpn/amneziawg-go](https://github.com/amnezia-vpn/amneziawg-go) with up-to-date modules
-- Minimal runtime image based on Alpine 3.23
+- Minimal runtime image based on Alpine 3.24
 
 Currently supports: **ARMv7**, **ARM64**, and **MIPS**.
 
@@ -19,28 +19,28 @@ Currently supports: **ARMv7**, **ARM64**, and **MIPS**.
 ## Dependencies Used
 
 ```
-go 1.26.4
+go 1.26.5
     github.com/Jigsaw-Code/outline-sdk v0.0.20
     github.com/Jigsaw-Code/outline-sdk/x v0.0.8
     github.com/goccy/go-yaml v1.19.2
     go.uber.org/atomic v1.11.0
-    golang.org/x/crypto v0.53.0
-    golang.org/x/net v0.55.0
-    golang.org/x/sys v0.46.0
+    golang.org/x/crypto v0.54.0
+    golang.org/x/net v0.57.0
+    golang.org/x/sys v0.47.0
     golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
     gvisor.dev/gvisor v0.0.0-20260604230326-c7dbb92365cd
     github.com/google/btree v1.1.3 // indirect
     github.com/gorilla/websocket v1.5.3 // indirect
     github.com/shadowsocks/go-shadowsocks2 v0.1.5 // indirect
     github.com/stretchr/testify v1.11.1 // indirect
-    golang.org/x/exp v0.0.0-20260603202125-055de637280b // indirect
-    golang.org/x/mobile v0.0.0-20260602190626-68735029466e // indirect
-    golang.org/x/mod v0.37.0 // indirect
-    golang.org/x/sync v0.21.0 // indirect
+    golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 // indirect
+    golang.org/x/mobile v0.0.0-20260709172247-6129f5bee9d5 // indirect
+    golang.org/x/mod v0.38.0 // indirect
+    golang.org/x/sync v0.22.0 // indirect
     golang.org/x/time v0.15.0 // indirect
-    golang.org/x/tools v0.45.0 // indirect
+    golang.org/x/tools v0.48.0 // indirect
 
-    AWG_Tools v1.0.20260223
+    amneziawg-tools v1.0.20260618-2
 ```
 
 ## Building Docker Image
@@ -80,6 +80,23 @@ AmneziaWG 2.0 (`AWG2`) extends the original obfuscation parameter set. The full 
 | `I1`–`I5` | `<r N><b 0x...>` | Obfuscation chain blocks (AWG2, omit lines that have no value) |
 
 > **Important:** Do not include `I2`–`I5` lines with empty values. The `awg setconf` tool cannot parse empty parameters and will fail to bring up the tunnel.
+
+## AmneziaWG 3.0 Parameters
+
+AmneziaWG 3.0 (`AWG3`) adds header protection, random content padding, and randomizable handshake timings on top of AWG2. All of these are optional and default to the AWG2/WireGuard behavior when omitted:
+
+| Parameter | Format | Description |
+|-----------|--------|-------------|
+| `HeaderProtectionKey` | key (string) | Encrypts the low-entropy header fields with ChaCha20, generated with `awg genkey`; requires all configured `S1`–`S4` to be at least 8 |
+| `ContentPaddingAddition` | `value` or `min-max` | Extra random padding appended to transport packet content |
+| `RekeyAfterTime` | `value` or `min-max` (seconds) | Time after which the client attempts a new handshake |
+| `RekeyTimeout` | `value` or `min-max` (seconds) | Timeout after which a handshake attempt is retried |
+| `RejectAfterTime` | `value` or `min-max` (seconds) | Time after which the client forces a new handshake and rejects further data on the old session |
+| `KeepaliveTimeout` | `value` or `min-max` (seconds) | Time since the last sent data after which a keepalive is sent |
+| `MaxHandshakeAttempts` | `value` or `min-max` | Maximum number of handshake retries before giving up |
+| `PersistentKeepalive` (`[Peer]`) | `value` or `min-max` (seconds) | Persistent keepalive interval; now accepts a range |
+
+> **Note:** As with the AWG2 parameters, `RekeyAfterTime`/`RekeyTimeout`/`RejectAfterTime`/`KeepaliveTimeout`/`MaxHandshakeAttempts` are client-side only and don't need to match on both peers. `HeaderProtectionKey` and `ContentPaddingAddition` are recommended to be set on both sides.
 
 ## Sample wg0.conf
 

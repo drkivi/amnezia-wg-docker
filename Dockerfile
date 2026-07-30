@@ -16,7 +16,8 @@ FROM alpine:${ALPINE_VERSION}
 
 RUN apk update && apk add --no-cache \
     bash openrc iptables iptables-legacy iproute2 \
-    nftables xtables-addons openresolv tcpdump && \
+    nftables xtables-addons openresolv tcpdump \
+    curl iputils bind-tools && \
     apk upgrade --no-cache && \
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /var/log/*
 
