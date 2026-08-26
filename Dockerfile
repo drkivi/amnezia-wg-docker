@@ -1,4 +1,4 @@
-ARG GOLANG_VERSION=1.26.6
+ARG GOLANG_VERSION=1.27.0
 # Docker only publishes the golang+alpine composite tag at alpine minor granularity
 # (no ".../alpine3.24.1"), so the builder stage pins the minor line here...
 ARG GOLANG_ALPINE_MINOR=3.24

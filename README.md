@@ -4,7 +4,7 @@ This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sanniko
 
 Key features of this fork:
 - Full **AmneziaWG 3.1** support — random packet trailers (`RandomTrailers`) and disableable cookie replies (`DisableCookies`), on top of AWG 3.0's header protection (`HeaderProtectionKey`), random content padding (`ContentPaddingAddition`), and randomizable handshake timings, and the `S3`/`S4`, `H1`–`H4` range format, and `I1`–`I5` obfuscation chain parameters from AmneziaWG 2.0
-- Upgraded to Go 1.26.6 with all dependencies updated to latest secure versions
+- Upgraded to Go 1.27.0 with all dependencies updated to latest secure versions (where upstream compatibility allows)
 - Built from [drkivi/amneziawg-go](https://github.com/drkivi/amneziawg-go) — a maintained fork of [amnezia-vpn/amneziawg-go](https://github.com/amnezia-vpn/amneziawg-go) with up-to-date modules
 - Minimal runtime image based on Alpine 3.24
 
@@ -19,7 +19,7 @@ Currently supports: **ARMv7**, **ARM64**, and **MIPS**.
 ## Dependencies Used
 
 ```
-go 1.26.6
+go 1.27.0
     github.com/goccy/go-yaml v1.19.2
     go.uber.org/atomic v1.11.0
     golang.getoutline.org/sdk v0.0.23
@@ -35,10 +35,9 @@ go 1.26.6
     github.com/gorilla/websocket v1.5.3 // indirect
     github.com/onsi/ginkgo/v2 v2.12.0 // indirect
     github.com/quic-go/qpack v0.5.1 // indirect
-    github.com/quic-go/quic-go v0.48.1 // indirect
+    github.com/quic-go/quic-go v0.52.0 // indirect
     github.com/shadowsocks/go-shadowsocks2 v0.1.5 // indirect
-    github.com/stretchr/testify v1.11.1 // indirect
-    go.uber.org/mock v0.4.0 // indirect
+    go.uber.org/mock v0.5.0 // indirect
     golang.org/x/exp v0.0.0-20260813180055-c1d0aacb2297 // indirect
     golang.org/x/mobile v0.0.0-20260816165457-f98cc9b3c733 // indirect
     golang.org/x/mod v0.40.0 // indirect
@@ -49,6 +48,8 @@ go 1.26.6
 
     amneziawg-tools v3.1.20260812
 ```
+
+> **Note:** `quic-go` is pinned at `v0.52.0` rather than the latest release. `golang.getoutline.org/sdk/x` v0.2.0 (the Outline circumvention transport used for `RandomTrailers`/smart-dialing fallback) still depends on the `quic.EarlyConnection` API, which was removed in `quic-go` v0.57.0 — so 2 of 4 previously-known `quic-go` CVEs (both QPACK HTTP/3 DoS issues, fixed upstream in v0.57.0/v0.59.1) can't be resolved until `outline-sdk/x` publishes a compatible release. The other 2 CVEs are fixed by the v0.52.0 bump.
 
 ## Building Docker Image
 
