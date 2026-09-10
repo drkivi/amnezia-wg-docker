@@ -1,4 +1,4 @@
-ARG GOLANG_VERSION=1.27.0
+ARG GOLANG_VERSION=1.27.1
 # Docker only publishes the golang+alpine composite tag at alpine minor granularity
 # (no ".../alpine3.24.1"), so the builder stage pins the minor line here...
 ARG GOLANG_ALPINE_MINOR=3.24
@@ -52,6 +52,14 @@ RUN sed -i 's/^\(tty\d\:\:\)/#\1/' /etc/inittab && \
 
 
 RUN sed -i 's/cmd sysctl -q \(.*\?\)=\(.*\)/[[ "$(sysctl -n \1)" != "\2" ]] \&\& \0/' /usr/bin/awg-quick
+
+# awg-quick's cmd_up() runs PreUp hooks (resolvconf -u, iptables rules) before
+# set_config (which resolves any hostname Endpoint via awg setconf). Running
+# resolvconf/iptables first has been observed to break that DNS resolution on
+# some devices, causing awg-quick's own EXIT trap to tear the interface back
+# down with no visible error. Swap the two calls so set_config runs first.
+RUN sed -i '/^\tadd_if$/{N;N;s/\(\tadd_if\)\n\(\texecute_hooks "\${PRE_UP\[@\]}"\)\n\(\tset_config\)/\1\n\3\n\2/}' /usr/bin/awg-quick && \
+    awk '/^\tadd_if$/ { getline; if ($0 != "\tset_config") { print "PreUp/set_config reorder patch did not apply as expected" > "/dev/stderr"; exit 1 } }' /usr/bin/awg-quick
 
 RUN rc-update add wg-quick default
 

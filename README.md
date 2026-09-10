@@ -4,7 +4,8 @@ This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sanniko
 
 Key features of this fork:
 - Full **AmneziaWG 3.1** support — random packet trailers (`RandomTrailers`) and disableable cookie replies (`DisableCookies`), on top of AWG 3.0's header protection (`HeaderProtectionKey`), random content padding (`ContentPaddingAddition`), and randomizable handshake timings, and the `S3`/`S4`, `H1`–`H4` range format, and `I1`–`I5` obfuscation chain parameters from AmneziaWG 2.0
-- Upgraded to Go 1.27.0 with all dependencies updated to latest secure versions (where upstream compatibility allows)
+- Upgraded to Go 1.27.1 with all dependencies updated to latest secure versions (where upstream compatibility allows)
+- Patches `awg-quick` at build time to run `set_config` before the `PreUp` hooks (`resolvconf -u`, iptables), avoiding a race where those hooks disrupt DNS resolution of hostname `Endpoint`s and silently tear the interface back down
 - Built from [drkivi/amneziawg-go](https://github.com/drkivi/amneziawg-go) — a maintained fork of [amnezia-vpn/amneziawg-go](https://github.com/amnezia-vpn/amneziawg-go) with up-to-date modules
 - Minimal runtime image based on Alpine 3.24
 
@@ -19,14 +20,14 @@ Currently supports: **ARMv7**, **ARM64**, and **MIPS**.
 ## Dependencies Used
 
 ```
-go 1.27.0
+go 1.27.1
     github.com/goccy/go-yaml v1.19.2
     go.uber.org/atomic v1.11.0
     golang.getoutline.org/sdk v0.0.23
-    golang.getoutline.org/sdk/x v0.2.0
-    golang.org/x/crypto v0.55.0
-    golang.org/x/net v0.58.0
-    golang.org/x/sys v0.47.0
+    golang.getoutline.org/sdk/x v0.2.1
+    golang.org/x/crypto v0.57.0
+    golang.org/x/net v0.59.0
+    golang.org/x/sys v0.48.0
     golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
     gvisor.dev/gvisor v0.0.0-20260604230326-c7dbb92365cd
     github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
@@ -40,16 +41,16 @@ go 1.27.0
     go.uber.org/mock v0.5.0 // indirect
     golang.org/x/exp v0.0.0-20260813180055-c1d0aacb2297 // indirect
     golang.org/x/mobile v0.0.0-20260816165457-f98cc9b3c733 // indirect
-    golang.org/x/mod v0.40.0 // indirect
-    golang.org/x/sync v0.22.0 // indirect
-    golang.org/x/text v0.41.0 // indirect
+    golang.org/x/mod v0.41.0 // indirect
+    golang.org/x/sync v0.23.0 // indirect
+    golang.org/x/text v0.42.0 // indirect
     golang.org/x/time v0.15.0 // indirect
     golang.org/x/tools v0.49.0 // indirect
 
     amneziawg-tools v3.1.20260812
 ```
 
-> **Note:** `quic-go` is pinned at `v0.52.0` rather than the latest release. `golang.getoutline.org/sdk/x` v0.2.0 (the Outline circumvention transport used for `RandomTrailers`/smart-dialing fallback) still depends on the `quic.EarlyConnection` API, which was removed in `quic-go` v0.57.0 — so 2 of 4 previously-known `quic-go` CVEs (both QPACK HTTP/3 DoS issues, fixed upstream in v0.57.0/v0.59.1) can't be resolved until `outline-sdk/x` publishes a compatible release. The other 2 CVEs are fixed by the v0.52.0 bump.
+> **Note:** `quic-go` is pinned at `v0.52.0` rather than the latest release. `golang.getoutline.org/sdk/x`, even at the latest v0.2.1, still depends on the `quic.EarlyConnection` API, which was removed in `quic-go` v0.57.0 — so 2 of 4 previously-known `quic-go` CVEs (both QPACK HTTP/3 DoS issues, fixed upstream in v0.57.0/v0.59.1) can't be resolved until `outline-sdk/x` publishes a compatible release. The other 2 CVEs are fixed by the v0.52.0 bump.
 
 ## Building Docker Image
 
