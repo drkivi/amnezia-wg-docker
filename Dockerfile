@@ -1,9 +1,9 @@
-ARG GOLANG_VERSION=1.27.2
+ARG GOLANG_VERSION=1.27.3
 # Docker only publishes the golang+alpine composite tag at alpine minor granularity
 # (no ".../alpine3.24.1"), so the builder stage pins the minor line here...
 ARG GOLANG_ALPINE_MINOR=3.24
 # ...while the runtime stage below pins the exact patch release.
-ARG ALPINE_VERSION=3.24.2
+ARG ALPINE_VERSION=3.24.3
 FROM golang:${GOLANG_VERSION}-alpine${GOLANG_ALPINE_MINOR} AS builder
 
 RUN apk update && apk add --no-cache \

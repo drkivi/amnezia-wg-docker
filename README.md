@@ -4,10 +4,10 @@ This repository is a fork of [amnezia-wg-docker](https://github.com/yury-sanniko
 
 Key features of this fork:
 - Full **AmneziaWG 3.1** support — random packet trailers (`RandomTrailers`) and disableable cookie replies (`DisableCookies`), on top of AWG 3.0's header protection (`HeaderProtectionKey`), random content padding (`ContentPaddingAddition`), and randomizable handshake timings, and the `S3`/`S4`, `H1`–`H4` range format, and `I1`–`I5` obfuscation chain parameters from AmneziaWG 2.0
-- Upgraded to Go 1.27.2 with all dependencies updated to latest secure versions (where upstream compatibility allows)
+- Upgraded to Go 1.27.3 with all dependencies updated to latest secure versions (where upstream compatibility allows)
 - Patches `awg-quick` at build time to run `set_config` before the `PreUp` hooks (`resolvconf -u`, iptables), avoiding a race where those hooks disrupt DNS resolution of hostname `Endpoint`s and silently tear the interface back down
 - Built from [drkivi/amneziawg-go](https://github.com/drkivi/amneziawg-go) — a maintained fork of [amnezia-vpn/amneziawg-go](https://github.com/amnezia-vpn/amneziawg-go) with up-to-date modules
-- Minimal runtime image based on Alpine 3.24.2
+- Minimal runtime image based on Alpine 3.24.3
 
 Currently supports: **ARMv7**, **ARM64**, and **MIPS**.
 
@@ -20,7 +20,7 @@ Currently supports: **ARMv7**, **ARM64**, and **MIPS**.
 ## Dependencies Used
 
 ```
-go 1.27.2
+go 1.27.3
     github.com/goccy/go-yaml v1.19.2
     go.uber.org/atomic v1.12.0
     golang.getoutline.org/sdk v0.0.23
@@ -39,13 +39,13 @@ go 1.27.2
     github.com/quic-go/quic-go v0.52.0 // indirect
     github.com/shadowsocks/go-shadowsocks2 v0.1.5 // indirect
     go.uber.org/mock v0.5.0 // indirect
-    golang.org/x/exp v0.0.0-20260813180055-c1d0aacb2297 // indirect
-    golang.org/x/mobile v0.0.0-20260816165457-f98cc9b3c733 // indirect
-    golang.org/x/mod v0.41.0 // indirect
+    golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
+    golang.org/x/mobile v0.0.0-20261011034528-197770444867 // indirect
+    golang.org/x/mod v0.42.0 // indirect
     golang.org/x/sync v0.24.0 // indirect
     golang.org/x/text v0.43.0 // indirect
-    golang.org/x/time v0.15.0 // indirect
-    golang.org/x/tools v0.51.0 // indirect
+    golang.org/x/time v0.16.0 // indirect
+    golang.org/x/tools v0.52.0 // indirect
 
     amneziawg-tools v3.1.20260812
 ```
